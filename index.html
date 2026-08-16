@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vents Pornichet</title>
+<meta name="description" content="Suivi du vent à Pornichet pour le kite et le wing : relevé actuel, courbe 24 h et période personnalisable.">
+<meta name="theme-color" content="#0b1220">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vents Pornichet">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="./icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__id">
+    <svg class="topbar__logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 8h11" opacity=".6"/><path d="M14 5l3 3-3 3" opacity=".6"/>
+        <path d="M3 13h14"/><path d="M17 10l3 3-3 3"/>
+        <path d="M5 18h8" opacity=".6"/>
+      </g>
+    </svg>
+    <h1>Vents Pornichet</h1>
+  </div>
+  <div class="topbar__right">
+    <label class="spot-select" id="spot-select-wrap" hidden>
+      <span class="sr-only">Spot</span>
+      <select id="spot-select"></select>
+    </label>
+    <button type="button" id="refresh-btn" class="icon-btn" title="Rafraîchir" aria-label="Rafraîchir les données">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 11a8 8 0 1 0-.7 4.3"/><path d="M20 20v-5h-5"/>
+        </g>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===================== Vent actuel ===================== -->
+  <section class="card live" id="live-card" aria-labelledby="live-title">
+    <div class="card__head">
+      <h2 id="live-title">Vent actuel</h2>
+      <span class="badge badge--muted" title="Valeurs approchées, corrigées de −1 nœud. Voir « Précision » en bas de page.">estimation</span>
+    </div>
+
+    <div class="live__body" id="live-body" aria-live="polite">
+      <div class="live__loading skeleton-row">Chargement du relevé…</div>
+    </div>
+
+    <template id="tpl-live">
+      <div class="live__grid">
+        <div class="live__hero">
+          <div class="hero-value"><span class="hero-num" data-f="avg">–</span><span class="hero-unit">kt</span></div>
+          <div class="hero-label">vent moyen</div>
+        </div>
+        <div class="live__side">
+          <div class="metric">
+            <div class="metric__label">Rafale</div>
+            <div class="metric__value"><span data-f="max">–</span> <span class="metric__unit">kt</span></div>
+          </div>
+          <div class="metric metric--dir">
+            <div class="metric__label">Direction</div>
+            <div class="metric__value">
+              <svg class="dir-arrow" data-f="dirArrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 2 L12 22 M12 2 L6.5 9 M12 2 L17.5 9" fill="none" stroke="currentColor"
+                      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span data-f="dir">–</span>
+            </div>
+            <div class="metric__sub" data-f="dirFrom"></div>
+          </div>
+        </div>
+      </div>
+      <div class="live__foot">
+        <span class="pill" data-f="condPill"><span class="pill__dot" aria-hidden="true"></span><span data-f="cond"></span></span>
+        <span class="pill" data-f="freshPill"><span class="pill__dot" aria-hidden="true"></span><span data-f="fresh"></span></span>
+        <span class="live__time" data-f="time"></span>
+      </div>
+    </template>
+  </section>
+
+  <!-- ===================== Historique ===================== -->
+  <section class="card chart-card" aria-labelledby="chart-title">
+    <div class="card__head">
+      <h2 id="chart-title">Historique</h2>
+      <span class="badge badge--muted" id="chart-range-label"></span>
+    </div>
+
+    <div class="ranges" role="group" aria-label="Période affichée">
+      <button type="button" class="range-btn is-active" data-range="24">24 h</button>
+      <button type="button" class="range-btn" data-range="48">48 h</button>
+      <button type="button" class="range-btn" data-range="custom">Personnalisé</button>
+    </div>
+
+    <div class="custom-panel" id="custom-panel" hidden>
+      <div class="field">
+        <label for="in-start">Début</label>
+        <input type="datetime-local" id="in-start">
+      </div>
+      <div class="field">
+        <label for="in-end">Fin</label>
+        <input type="datetime-local" id="in-end">
+      </div>
+      <div class="field">
+        <label for="in-step">Pas de temps</label>
+        <select id="in-step">
+          <option value="auto" selected>Auto</option>
+          <option value="0">Brut (~10 min)</option>
+          <option value="30">30 min</option>
+          <option value="60">1 h</option>
+          <option value="180">3 h</option>
+        </select>
+      </div>
+      <p class="custom-note" id="custom-note"></p>
+    </div>
+
+    <div class="legend" id="legend" hidden>
+      <span class="legend__item"><span class="legend__swatch legend__swatch--avg" aria-hidden="true"></span>
+        Vent moyen <b id="legend-avg"></b></span>
+      <span class="legend__item"><span class="legend__swatch legend__swatch--max" aria-hidden="true"></span>
+        Rafale <b id="legend-max"></b></span>
+    </div>
+
+    <div class="chart-wrap" id="chart-wrap">
+      <div class="chart-state" id="chart-state">Chargement de l'historique…</div>
+      <div class="tooltip" id="tooltip" hidden role="status"></div>
+    </div>
+
+    <p class="chart-summary" id="chart-summary"></p>
+
+    <details class="table-view" id="table-view" hidden>
+      <summary>Voir les données en tableau</summary>
+      <div class="table-scroll"><table id="data-table"><caption class="sr-only">Relevés de vent pour la période affichée</caption></table></div>
+    </details>
+  </section>
+
+  <!-- ===================== Notes ===================== -->
+  <section class="card notes">
+    <h2>Précision &amp; limites</h2>
+    <ul>
+      <li>Les valeurs proviennent du réseau <b>windmorbihan</b> (capteur LCJ du feu du port), et non de la station officielle GlissEvolution.</li>
+      <li>Une correction fixe de <b>−1 nœud</b> est appliquée à la moyenne et à la rafale. L'écart réel varie selon les conditions : considérez l'affichage comme une <b>estimation</b>.</li>
+      <li>La direction est affichée telle quelle, sans correction.</li>
+      <li>Pas de valeur « min » : la source ne la fournit pas.</li>
+      <li>L'historique disponible remonte à environ <b>4 à 5 jours</b>.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>Données&nbsp;: windmorbihan · <span id="app-version"></span></span>
+</footer>
+
+<script src="./app.js" defer></script>
+</body>
+</html>

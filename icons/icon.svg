@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Vents Pornichet">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#17243c"/>
+      <stop offset="1" stop-color="#080e1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" fill="url(#bg)"/>
+  <g fill="none" stroke="#5ba2f0" stroke-width="8.4" stroke-linecap="round" stroke-linejoin="round">
+    <g opacity=".6">
+      <path d="M24 33H62"/>
+      <path d="M52.2 24.2 62 33l-9.8 8.8"/>
+    </g>
+    <path d="M18.5 50H75"/>
+    <path d="M65.2 41.2 75 50l-9.8 8.8"/>
+    <path d="M28.5 67h29" opacity=".42"/>
+  </g>
+</svg>
